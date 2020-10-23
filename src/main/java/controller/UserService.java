@@ -61,7 +61,7 @@ public class UserService extends HttpServlet {
 		}*/
 		
 		// GET BY NAME
-        if (request.getParameter("email") != null) {
+        /*if (request.getParameter("email") != null) {
         	System.out.println(request.getParameter("email"));
         	System.out.println(request.getParameter("password"));
         	
@@ -93,10 +93,10 @@ public class UserService extends HttpServlet {
                 response.getWriter().flush();
             }
             return;
-        }
+        }*/
 
 		// GET ALL
-		List<User> list = UserDAO.getAllUsers();
+		/*List<User> list = UserDAO.getAllUsers();
 
 		try {
 			JSONArray jArray = new JSONArray();
@@ -121,14 +121,14 @@ public class UserService extends HttpServlet {
 			response.getWriter().flush();
 		} catch (Exception e) {
 
-		}
+		}*/
 
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-		if (request.getParameter("email") != null) {
+		/*if (request.getParameter("email") != null) {
         	System.out.println(request.getParameter("email"));
         	System.out.println(request.getParameter("password"));
         	
@@ -150,7 +150,7 @@ public class UserService extends HttpServlet {
                 response.getWriter().flush();
  
             return;
-        }
+        */
 
 		
 		StringBuffer jb = new StringBuffer();
@@ -167,13 +167,14 @@ public class UserService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			user = UserDAO.addUser(jsonObject.getString("email"), jsonObject.getString("password"),
+			user = UserDAO.addUser(jsonObject.getString("email"), jsonObject.getString("nome"), jsonObject.getString("password"),
 			jsonObject.getString("endereco"), jsonObject.getString("cep"), jsonObject.getString("cidade"),
 			jsonObject.getString("estado"));
 			System.out.println(user.toString());
 			// Response
 			jsonObject = new JSONObject();
 			jsonObject.put("id", user.getId());
+			jsonObject.put("nome", user.getLogin());
 			jsonObject.put("email", user.getLogin());
 			jsonObject.put("password", user.getPassword());
 			jsonObject.put("endereco", user.getEndereco());
@@ -193,7 +194,7 @@ public class UserService extends HttpServlet {
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// UPDATE BY ID
-        String pathInfo = request.getPathInfo();
+        /*String pathInfo = request.getPathInfo();
  
         if (pathInfo != null) {
             String[] params = pathInfo.split("/");
@@ -237,13 +238,13 @@ public class UserService extends HttpServlet {
                 response.getWriter().print(jsonObject.toString());
                 response.getWriter().flush();
             }
-        }
+        }*/
 	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// DELETE BY ID
-        String pathInfo = request.getPathInfo();
+        /*String pathInfo = request.getPathInfo();
  
         if (pathInfo != null) {
             String[] params = pathInfo.split("/");
@@ -255,7 +256,7 @@ public class UserService extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().flush();
             }
-        }
+        }*/
 	}
 
 }

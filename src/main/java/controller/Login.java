@@ -28,7 +28,7 @@ public class Login extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		StringBuffer jb = new StringBuffer();
+		/*StringBuffer jb = new StringBuffer();
 		String line = null;
 		try {
 			BufferedReader reader = request.getReader();
@@ -60,7 +60,7 @@ public class Login extends HttpServlet {
 				return;
 			}
 		} catch (JSONException e) {
-		}
+		}*/
 	}
 
 }

@@ -2,6 +2,7 @@ package model;
 
 public class User {
 	int id;
+	String nome;
 	String login;
 	String password;
 	String endereco;
@@ -13,9 +14,10 @@ public class User {
 		return "User [id=" + id + ", login=" + login + ", password=" + password + ", endereco=" + endereco + ", cep=" + cep + ", cidade=" + cidade + ", estado=" + estado + "]";
 	}
 	
-	public User(int id, String login, String password, String endereco, String cep, String cidade, String estado) {
+	public User(int id, String nome, String login, String password, String endereco, String cep, String cidade, String estado) {
 		super();
 		this.id = id;
+		this.nome = nome;
 		this.login = login;
 		this.password = password;
 		this.endereco = endereco;
@@ -73,5 +75,13 @@ public class User {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getNome() {
+		return nome;
+	}
+	
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 }
