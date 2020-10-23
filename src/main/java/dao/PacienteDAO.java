@@ -1,16 +1,23 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.Paciente;
+import model.User;
+import util.DbUtil;
 
 public class PacienteDAO {
 	private static final Map<Integer, Paciente> userMap = new HashMap<Integer, Paciente>();
 	private static int i = 4;
-
+	private static Connection connection = DbUtil.getConnection();
 	static {
 		initPacientes();
 	}
@@ -30,10 +37,25 @@ public class PacienteDAO {
 	}
 
 	public static Paciente addPaciente(String nome, String email, String cidade, String estado, String cep) {
-		Paciente paciente = new Paciente(i, nome, email, cidade, estado, cep);
-		userMap.put(paciente.getId(), paciente);
-		i++;
-		return paciente;
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Paciente(nome, email, cep, cidade, estado) " 
+            + "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            
+            pStmt.setString(1, nome);
+            pStmt.setString(2, email);
+            pStmt.setString(3, cep);
+            pStmt.setString(4, cidade);
+            pStmt.setString(5, estado);
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Paciente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"),rs.getString("cidade"), rs.getString("estado"), rs.getString("cep"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public static Paciente updatePaciente(int id, String nome, String email, String cidade, String estado, String cep) {
