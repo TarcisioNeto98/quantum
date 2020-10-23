@@ -1,16 +1,23 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.Funcionario;
+import model.Paciente;
+import util.DbUtil;
 
 public class FuncionarioDAO {
 	private static final Map<Integer, Funcionario> userMap = new HashMap<Integer, Funcionario>();
 	private static int i = 4;
-	
+	private static Connection connection = DbUtil.getConnection();
 	static {
 		initFuncionarios();
 	}
@@ -29,11 +36,27 @@ public class FuncionarioDAO {
 		return userMap.get(id);
 	}
 
-	public static Funcionario addFuncionario(String nome, String endereco, String cidade, String estado, String cep, double salario) {
-		Funcionario funcionario = new Funcionario(i, nome, endereco, cidade, estado, cep, salario);
-		userMap.put(funcionario.getId(), funcionario);
-		i++;
-		return funcionario;
+	public static Funcionario addFuncionario(String nome, String endereco, String cidade, String estado, String cep, String salario) {
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Funcionario(nome, endereco, cep, cidade, estado, salario) " 
+            + "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            pStmt.setString(1, nome);
+            pStmt.setString(2, endereco);
+            pStmt.setString(3, cep);
+            pStmt.setString(4, cidade);
+            pStmt.setString(5, estado);
+            pStmt.setString(6, salario);
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Funcionario(rs.getInt("id"), rs.getString("nome"), rs.getString("endereco"),rs.getString("cidade"), 
+                rs.getString("estado"), rs.getString("cep"), Double.parseDouble(rs.getString("salario")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public static Funcionario updateFuncionario(int id, String nome, String endereco, String cidade, String estado, String cep, double salario) {

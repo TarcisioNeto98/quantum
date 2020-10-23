@@ -14,7 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dao.PacienteDAO;
 import dao.ProcedimentoDAO;
+import model.Paciente;
 import model.Procedimento;
 
 @WebServlet ("/api/procedimentos/*")
@@ -81,7 +83,39 @@ public class ProcedimentoService extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// UPDATE BY ID
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+		}
+
+		Procedimento procedimento = null;
+		JSONObject jsonObject = null;
+		try {
+			// Request
+			jsonObject = new JSONObject(jb.toString());
+			procedimento = ProcedimentoDAO.addProcedimento(jsonObject.getString("nome"), jsonObject.getString("valor"),
+			jsonObject.getString("descricao"));
+			System.out.println(procedimento.toString());
+			// Response
+			jsonObject = new JSONObject();
+			jsonObject.put("id", procedimento.getId());
+			jsonObject.put("nome", procedimento.getNome());
+			jsonObject.put("valor", procedimento.getValor());
+			jsonObject.put("descricao", procedimento.getDescricao());
+		} catch (JSONException e) {
+		}
+
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().print(jsonObject.toString());
+		response.getWriter().flush();
+
+		
+		/*// UPDATE BY ID
         String pathInfo = request.getPathInfo();
  
         if (pathInfo != null) {
@@ -122,7 +156,7 @@ public class ProcedimentoService extends HttpServlet {
                 response.getWriter().print(jsonObject.toString());
                 response.getWriter().flush();
             }
-        }
+        }*/
 	}
 	
 	@Override

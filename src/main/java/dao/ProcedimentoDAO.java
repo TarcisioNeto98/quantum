@@ -1,13 +1,21 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.Funcionario;
 import model.Procedimento;
+import util.DbUtil;
 
 public class ProcedimentoDAO {
+	private static Connection connection = DbUtil.getConnection();
 	private static final Map<Integer, Procedimento> userMap = new HashMap<Integer, Procedimento>();
 	private static int i = 4;
 	
@@ -29,11 +37,24 @@ public class ProcedimentoDAO {
 		return userMap.get(id);
 	}
 
-	public static Procedimento addProcedimento(int id, String nome, double valor, String descricao) {
-		Procedimento procedimento = new Procedimento(i, nome, valor, descricao);
-		userMap.put(procedimento.getId(), procedimento);
-		i++;
-		return procedimento;
+	public static Procedimento addProcedimento(String nome, String valor, String descricao) {
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Procedimento(nome, valor, descricao) " 
+            + "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            pStmt.setString(1, nome);
+            pStmt.setString(2, valor);
+            pStmt.setString(3, descricao);
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Procedimento(rs.getInt("id"), rs.getString("nome"), Double.parseDouble(rs.getString("valor"))
+                ,rs.getString("descricao"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public static Procedimento updateProcedimento(int id, String nome, double valor, String descricao) {

@@ -101,8 +101,9 @@ public class FuncionarioService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"), "Endereco", jsonObject.getString("cidade"), jsonObject.getString("estado"), jsonObject.getString("cep"),100.0);
-			System.out.println(funcionario.toString());
+			funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"), jsonObject.getString("endereco"), 
+			jsonObject.getString("cidade"), jsonObject.getString("estado"), jsonObject.getString("cep"),
+			jsonObject.getString("salario"));
 			// Response
 			jsonObject = new JSONObject();
 			jsonObject.put("id", funcionario.getId());
@@ -113,6 +114,7 @@ public class FuncionarioService extends HttpServlet {
 			jsonObject.put("cep", funcionario.getCep());
 			jsonObject.put("salario", funcionario.getSalario());
 		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 
 		response.setContentType("application/json");
