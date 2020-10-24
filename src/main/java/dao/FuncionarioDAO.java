@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import model.Funcionario;
-import model.Paciente;
 import util.DbUtil;
 
 public class FuncionarioDAO {
@@ -23,7 +22,19 @@ public class FuncionarioDAO {
 	public static Funcionario getFuncionario(int id) {
 		return userMap.get(id);
 	}
-
+	
+	public static int quantidadeFuncionario() {
+		try {
+        	PreparedStatement pStmt = connection.prepareStatement("SELECT COUNT(*) AS quantidade from Funcionario");
+        	ResultSet rs = pStmt.executeQuery();
+        	
+        	if(rs.next()) return rs.getInt("quantidade");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return 0;
+	}
+	
 	public static Funcionario addFuncionario(String nome, String email, String endereco, String cidade, String estado, String cep, String salario) {
 		try {
             PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Funcionario(nome, endereco, cep, cidade, estado, salario, email) " 

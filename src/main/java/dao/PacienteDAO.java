@@ -17,24 +17,23 @@ public class PacienteDAO {
 	private static final Map<Integer, Paciente> userMap = new HashMap<Integer, Paciente>();
 	private static int i = 4;
 	private static Connection connection = DbUtil.getConnection();
-	static {
-		initPacientes();
-	}
-
-	private static void initPacientes() {
-		Paciente paciente1 = new Paciente(1, "Carlos", "carlaweb@bol.com.br", "Sobral", "Ceará", "63700-866");
-		Paciente paciente2 = new Paciente(2, "Paula", "paulinha@yahoo.com.br", "Crato", "Ceará", "63420-888");
-		Paciente paciente3 = new Paciente(3, "João", "jao17@gmail.com", "Picos", "Piauí", "63735-869");
-
-		userMap.put(paciente1.getId(), paciente1);
-		userMap.put(paciente2.getId(), paciente2);
-		userMap.put(paciente3.getId(), paciente3);
-	}
-
+	
 	public static Paciente getPaciente(int id) {
 		return userMap.get(id);
 	}
-
+	
+	public static int quantidadePaciente() {
+		try {
+        	PreparedStatement pStmt = connection.prepareStatement("SELECT COUNT(*) AS quantidade from Paciente");
+        	ResultSet rs = pStmt.executeQuery();
+        	
+        	if(rs.next()) return rs.getInt("quantidade");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return 0;
+	}
+	
 	public static Paciente addPaciente(String nome, String email, String cidade, String estado, String cep) {
 		try {
             PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Paciente(nome, email, cep, cidade, estado) " 

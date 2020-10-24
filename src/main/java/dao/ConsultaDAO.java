@@ -18,16 +18,21 @@ public class ConsultaDAO {
 	private static int i = 4;
 	private static Connection connection = DbUtil.getConnection();
 	
-	static {
-		initConsultas();
-	}
-	
-	private static void initConsultas() {
-		
-	}
 
 	public static Consulta getConsulta(int id) {
 		return userMap.get(id);
+	}
+	
+	public static int quantidadeConsulta() {
+		try {
+        	PreparedStatement pStmt = connection.prepareStatement("SELECT COUNT(*) AS quantidade from Consulta");
+        	ResultSet rs = pStmt.executeQuery();
+        	
+        	if(rs.next()) return rs.getInt("quantidade");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return 0;
 	}
 
 	public static Consulta addConsulta(String valor, int idPaciente, int idDentista) {

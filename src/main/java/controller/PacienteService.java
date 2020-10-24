@@ -14,9 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import dao.FuncionarioDAO;
 import dao.PacienteDAO;
-import model.Funcionario;
 import model.Paciente;
 
 @WebServlet ("/api/pacientes/*")
@@ -29,6 +27,19 @@ public class PacienteService extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String path = request.getPathInfo();
+		
+		if(path.contains("quantidade")) {
+			JSONObject json = new JSONObject();
+			int quantidade = PacienteDAO.quantidadePaciente();
+			json.put("quantidade", quantidade);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(json.toString());
+			response.getWriter().flush();
+			return;
+		}
 	
 		// GET BY ID
 				/*String pathInfo = request.getPathInfo();
@@ -195,7 +206,6 @@ public class PacienteService extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// DELETE BY ID
         String id = request.getParameter("id");
-        
         PacienteDAO.deletePaciente(Integer.parseInt(id));
 	}
 }

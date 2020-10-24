@@ -2,7 +2,6 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,8 +24,21 @@ public class ConsultaService extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		String path = request.getPathInfo();
+		
+		if(path.contains("quantidade")) {
+			JSONObject json = new JSONObject();
+			int quantidade = ConsultaDAO.quantidadeConsulta();
+			json.put("quantidade", quantidade);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(json.toString());
+			response.getWriter().flush();
+			return;
+		}
+		
 		// GET BY ID
-		String pathInfo = request.getPathInfo();
+		/*String pathInfo = request.getPathInfo();
 
 		if (pathInfo != null) {
 			String[] params = pathInfo.split("/");
@@ -72,7 +83,7 @@ public class ConsultaService extends HttpServlet {
 			response.getWriter().flush();
 		} catch (Exception e) {
 
-		}
+		}*/
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

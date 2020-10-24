@@ -2,7 +2,6 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,14 +9,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import dao.DependenteDAO;
-import dao.PacienteDAO;
 import model.Dependente;
-import model.Paciente;
 
 @WebServlet ("/api/dependentes/*")
 public class DependenteService extends HttpServlet {
