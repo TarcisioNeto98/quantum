@@ -1,43 +1,59 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.Consulta;
+import util.DbUtil;
 
 public class ConsultaDAO {
 	private static final Map<Integer, Consulta> userMap = new HashMap<Integer, Consulta>();
 	private static int i = 4;
+	private static Connection connection = DbUtil.getConnection();
 	
 	static {
 		initConsultas();
 	}
 	
 	private static void initConsultas() {
-		Consulta consulta1 = new Consulta(1, "12-10-2019", 1, 2);
-		Consulta consulta2 = new Consulta(2, "07-04-2020", 2, 4);
-		Consulta consulta3 = new Consulta(3, "19-04-2020", 3, 4);
-
-		userMap.put(consulta1.getId(), consulta1);
-		userMap.put(consulta2.getId(), consulta2);
-		userMap.put(consulta3.getId(), consulta3);
+		
 	}
 
 	public static Consulta getConsulta(int id) {
 		return userMap.get(id);
 	}
 
-	public static Consulta addConsulta(String data, int idPaciente, int idDentista) {
-		Consulta consulta = new Consulta(i, data, idPaciente, idDentista);
-		userMap.put(consulta.getId(), consulta);
-		i++;
-		return consulta;
+	public static Consulta addConsulta(String valor, int idPaciente, int idDentista) {
+		
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Consulta(valor, idPaciente, idDentista) " 
+            + "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            
+            pStmt.setString(1, valor);
+            pStmt.setInt(2, idPaciente);
+            pStmt.setInt(3, idDentista);
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Consulta(rs.getInt("id"), rs.getString("valor"), rs.getDate("date").toString(), 
+                rs.getInt("idPaciente"),rs.getInt("idDentista"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public static Consulta updateConsulta(int id, String data, int idPaciente, int idDentista) {
-		Consulta consulta = new Consulta(id, data, idPaciente, idDentista);
+		Consulta consulta = null;
 		userMap.put(consulta.getId(), consulta);
 		return consulta;
 	}

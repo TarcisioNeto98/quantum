@@ -31,7 +31,7 @@ public class PacienteService extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
 		// GET BY ID
-				String pathInfo = request.getPathInfo();
+				/*String pathInfo = request.getPathInfo();
 
 				if (pathInfo != null) {
 					String[] params = pathInfo.split("/");
@@ -56,7 +56,7 @@ public class PacienteService extends HttpServlet {
 						}
 						return;
 					}
-				}
+				}*/
 				
 				/*
 				// GET BY NAME
@@ -84,33 +84,35 @@ public class PacienteService extends HttpServlet {
 		        } */
 
 				// GET ALL
-				List<Paciente> list = PacienteDAO.getAllPacientes();
+		try {
+			List<Paciente> list = PacienteDAO.getPacienteNomeEmail(request.getParameter("nome"),request.getParameter("email"));
+			JSONArray jArray = new JSONArray();
 
-				try {
-					JSONArray jArray = new JSONArray();
+			for (Paciente paciente : list) {
+				JSONObject jsonObject = new JSONObject();
 
-					for (Paciente paciente : list) {
-						JSONObject jsonObject = new JSONObject();
-
-						jsonObject.put("id", paciente.getId());
-						jsonObject.put("nome", paciente.getNome());
-						jsonObject.put("email", paciente.getEmail());
-						jsonObject.put("cidade", paciente.getCidade());
-						jsonObject.put("estado", paciente.getEstado());
-						jsonObject.put("cep", paciente.getCep());
-
-						jArray.put(jsonObject);
-					}
-
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					response.getWriter().print(jArray.toString());
-					response.getWriter().flush();
-				} catch (Exception e) {
-
-				}
-
+				jsonObject.put("id", paciente.getId());
+				jsonObject.put("nome", paciente.getNome());
+				jsonObject.put("email", paciente.getEmail());
+				jsonObject.put("cidade", paciente.getCidade());
+				jsonObject.put("estado", paciente.getEstado());
+				jsonObject.put("cep", paciente.getCep());
+				System.out.println(jsonObject.toString());
+						
+				jArray.put(jsonObject);
 			}
+					
+			System.out.println(jArray.toString());
+					
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(jArray.toString());
+			response.getWriter().flush();
+		} catch (Exception e) {
+
+		}
+
+	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		StringBuffer jb = new StringBuffer();
@@ -192,18 +194,8 @@ public class PacienteService extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// DELETE BY ID
-        String pathInfo = request.getPathInfo();
- 
-        if (pathInfo != null) {
-            String[] params = pathInfo.split("/");
- 
-            if (params.length > 0) {
-                PacienteDAO.deletePaciente(Integer.parseInt(params[1]));
- 
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().flush();
-            }
-        }
+        String id = request.getParameter("id");
+        
+        PacienteDAO.deletePaciente(Integer.parseInt(id));
 	}
 }

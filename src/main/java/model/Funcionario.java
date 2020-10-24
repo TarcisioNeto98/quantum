@@ -3,11 +3,19 @@ package model;
 public class Funcionario {
 	int id;
 	String nome;
+	String email;
 	String endereco;
 	String cidade;
 	String estado;
 	String cep;
 	Double salario;
+	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public int getId() {
 		return id;
 	}
@@ -50,10 +58,11 @@ public class Funcionario {
 	public void setSalario(Double salario) {
 		this.salario = salario;
 	}
-	public Funcionario(int id, String nome, String endereco, String cidade, String estado, String cep, Double salario) {
+	public Funcionario(int id, String nome, String email, String endereco, String cidade, String estado, String cep, Double salario) {
 		super();
 		this.id = id;
 		this.nome = nome;
+		this.email = email;
 		this.endereco = endereco;
 		this.cidade = cidade;
 		this.estado = estado;

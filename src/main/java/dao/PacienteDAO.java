@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import model.Paciente;
-import model.User;
 import util.DbUtil;
 
 public class PacienteDAO {
@@ -57,6 +56,25 @@ public class PacienteDAO {
         }
         return null;
 	}
+	
+	public static List<Paciente> getPacienteNomeEmail(String nome, String email){
+		List<Paciente> pacientes = new ArrayList<Paciente>();
+        try {
+        	PreparedStatement pStmt = connection.prepareStatement("SELECT * from Paciente where email=? and nome=?");
+        	pStmt.setString(1, email);
+        	pStmt.setString(2, nome);
+        	ResultSet rs = pStmt.executeQuery();
+            while (rs.next()) {
+                Paciente paciente = new Paciente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), rs.getString("cidade"),
+                rs.getString("estado"), rs.getString("cep"));
+                pacientes.add(paciente);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+ 
+        return pacientes;
+	}
 
 	public static Paciente updatePaciente(int id, String nome, String email, String cidade, String estado, String cep) {
 		Paciente paciente = new Paciente(id, nome, email, cidade, estado, cep);
@@ -65,8 +83,12 @@ public class PacienteDAO {
 	}
 
 	public static void deletePaciente(int id) {
-		if (userMap.containsKey(id)) {
-			userMap.remove(id);
+		try {
+			PreparedStatement pStmt = connection.prepareStatement("DELETE from Paciente WHERE id=?");
+        	pStmt.setInt(1, id);
+        	pStmt.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
 		}
 	}
 

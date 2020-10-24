@@ -3,8 +3,16 @@ package model;
 public class Consulta {
 	int id;
 	String data;
+	String valor;
 	int idPaciente;
 	int idDentista;
+	
+	public String getValor() {
+		return valor;
+	}
+	public void setValor(String valor) {
+		this.valor = valor;
+	}
 	public int getId() {
 		return id;
 	}
@@ -29,9 +37,10 @@ public class Consulta {
 	public void setIdDentista(int idDentista) {
 		this.idDentista = idDentista;
 	}
-	public Consulta(int id, String data, int idPaciente, int idDentista) {
+	public Consulta(int id,String valor, String data, int idPaciente, int idDentista) {
 		super();
 		this.id = id;
+		this.valor = valor;
 		this.data = data;
 		this.idPaciente = idPaciente;
 		this.idDentista = idDentista;

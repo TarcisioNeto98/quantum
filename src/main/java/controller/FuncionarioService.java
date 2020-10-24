@@ -15,7 +15,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dao.FuncionarioDAO;
+import dao.PacienteDAO;
 import model.Funcionario;
+import model.Paciente;
 
 @WebServlet ("/api/funcionarios/*")
 public class FuncionarioService extends HttpServlet {
@@ -27,63 +29,66 @@ public class FuncionarioService extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		// GET BY ID
-				String pathInfo = request.getPathInfo();
-
-				if (pathInfo != null) {
-					String[] params = pathInfo.split("/");
-
-					if (params.length > 0) {
-						Funcionario funcionario = FuncionarioDAO.getFuncionario(Integer.parseInt(params[1]));
-
-						if (funcionario != null) {
-							JSONObject jsonObject = new JSONObject();
-
-							jsonObject.put("id", funcionario.getId());
-							jsonObject.put("nome", funcionario.getNome());
-							jsonObject.put("endereco", funcionario.getEndereco());
-							jsonObject.put("cidade", funcionario.getCidade());
-							jsonObject.put("estado", funcionario.getEstado());
-							jsonObject.put("cep", funcionario.getCep());
-							jsonObject.put("salario", funcionario.getSalario());
-
-							response.setContentType("application/json");
-							response.setCharacterEncoding("UTF-8");
-							response.getWriter().print(jsonObject.toString());
-							response.getWriter().flush();
-						}
-						return;
-					}
-				}
 				
-				// GET ALL
-				List<Funcionario> list = FuncionarioDAO.getAllFuncionarios();
+		// GET ALL
+		/*List<Funcionario> list = FuncionarioDAO.getAllFuncionarios();
 
-				try {
-					JSONArray jArray = new JSONArray();
+		try {
+			JSONArray jArray = new JSONArray();
 
-					for (Funcionario funcionario : list) {
-						JSONObject jsonObject = new JSONObject();
+			for (Funcionario funcionario : list) {
+				JSONObject jsonObject = new JSONObject();
 
-						jsonObject.put("id", funcionario.getId());
-						jsonObject.put("nome", funcionario.getNome());
-						jsonObject.put("endereco", funcionario.getEndereco());
-						jsonObject.put("cidade", funcionario.getCidade());
-						jsonObject.put("estado", funcionario.getEstado());
-						jsonObject.put("cep", funcionario.getCep());
-						jsonObject.put("salario", funcionario.getSalario());
+				jsonObject.put("id", funcionario.getId());
+				jsonObject.put("nome", funcionario.getNome());
+				jsonObject.put("endereco", funcionario.getEndereco());
+				jsonObject.put("cidade", funcionario.getCidade());
+				jsonObject.put("estado", funcionario.getEstado());
+				jsonObject.put("cep", funcionario.getCep());
+				jsonObject.put("salario", funcionario.getSalario());
 
-						jArray.put(jsonObject);
-					}
+				jArray.put(jsonObject);
+			}
 
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					response.getWriter().print(jArray.toString());
-					response.getWriter().flush();
-				} catch (Exception e) {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(jArray.toString());
+			response.getWriter().flush();
+		} catch (Exception e) {
 
-				}
+		}*/
+		
+		try {
+			List<Funcionario> list = FuncionarioDAO.getFuncionarioNomeEmail(request.getParameter("nome"),request.getParameter("email"));
+			JSONArray jArray = new JSONArray();
+
+			for (Funcionario funcionario : list) {
+				JSONObject jsonObject = new JSONObject();
+
+				jsonObject.put("id", funcionario.getId());
+				jsonObject.put("nome", funcionario.getNome());
+				jsonObject.put("email", funcionario.getEmail());
+				jsonObject.put("cidade", funcionario.getCidade());
+				jsonObject.put("estado", funcionario.getEstado());
+				jsonObject.put("cep", funcionario.getCep());
+				jsonObject.put("endereco", funcionario.getEndereco());
+				jsonObject.put("salario", funcionario.getSalario());
+				System.out.println(jsonObject.toString());
+						
+				jArray.put(jsonObject);
+			}
+					
+			System.out.println(jArray.toString());
+					
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(jArray.toString());
+			response.getWriter().flush();
+		} catch (Exception e) {
+
+		}
+
+		
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -101,13 +106,14 @@ public class FuncionarioService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"), jsonObject.getString("endereco"), 
-			jsonObject.getString("cidade"), jsonObject.getString("estado"), jsonObject.getString("cep"),
-			jsonObject.getString("salario"));
+			funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"),jsonObject.getString("email"),
+			jsonObject.getString("endereco"), jsonObject.getString("cidade"), jsonObject.getString("estado"),
+			jsonObject.getString("cep"), jsonObject.getString("salario"));
 			// Response
 			jsonObject = new JSONObject();
 			jsonObject.put("id", funcionario.getId());
 			jsonObject.put("nome", funcionario.getNome());
+			jsonObject.put("email", funcionario.getEmail());
 			jsonObject.put("endereco", funcionario.getEndereco());
 			jsonObject.put("cidade", funcionario.getCidade());
 			jsonObject.put("estado", funcionario.getEstado());
@@ -175,18 +181,7 @@ public class FuncionarioService extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// DELETE BY ID
-        String pathInfo = request.getPathInfo();
- 
-        if (pathInfo != null) {
-            String[] params = pathInfo.split("/");
- 
-            if (params.length > 0) {
-                FuncionarioDAO.deleteFuncionario(Integer.parseInt(params[1]));
- 
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().flush();
-            }
-        }
+        int id = Integer.parseInt(request.getParameter("id"));
+        FuncionarioDAO.deleteFuncionario(id);
 	}
 }

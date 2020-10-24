@@ -1,45 +1,53 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.Dependente;
+import model.Paciente;
+import util.DbUtil;
 
 public class DependenteDAO {
 	private static final Map<Integer, Dependente> userMap = new HashMap<Integer, Dependente>();
 	private static int i = 4;
+	private static Connection connection = DbUtil.getConnection();
 	
-	static {
-		initDependentes();
-	}
 	
-	private static void initDependentes() {
-		Dependente dependente1 = new Dependente(1, "Maria Alice", "999.999.999-99", "Estudante", 2);
-		Dependente dependente2 = new Dependente(2, "Maria Julia", "999.999.999-99", "Estudante", 2);
-		Dependente dependente3 = new Dependente(3, "Maria Clara", "999.999.999-99", "Estudante", 2);
-		
-		userMap.put(dependente1.getId(), dependente1);
-		userMap.put(dependente2.getId(), dependente2);
-		userMap.put(dependente3.getId(), dependente3);
-	}
-
 	public static Dependente getDependente(int id) {
 		return userMap.get(id);
 	}
 
-	public static Dependente addDependente(int id, String nome, String cpf, String cargo, int idFuncionario) {
-		Dependente dependente = new Dependente(i, nome, cpf, cargo, idFuncionario);
-		userMap.put(dependente.getId(), dependente);
-		i++;
-		return dependente;
+	public static Dependente addDependente(String nome, String cpf, int idFuncionario) {
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Dependente(nome, cpf, idFuncionario) " 
+            + "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            
+            pStmt.setString(1, nome);
+            pStmt.setString(2, cpf);
+            pStmt.setInt(3, idFuncionario);
+            
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Dependente(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"),rs.getInt("idFuncionario"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public static Dependente updateDependente(int id, String nome, String cpf, String cargo, int idFuncionario) {
-		Dependente dependente = new Dependente(id, nome, cpf, cargo, idFuncionario);
-		userMap.put(dependente.getId(), dependente);
-		return dependente;
+		
+		return null;
 	}
 
 	public static void deleteDependente(int id) {

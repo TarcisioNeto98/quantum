@@ -15,15 +15,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dao.ConsultaDAO;
-import dao.UserDAO;
 import model.Consulta;
-import model.User;
 
 @WebServlet ("/api/consultas/*")
 public class ConsultaService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
- 
     public ConsultaService() {
         super();
     }
@@ -95,11 +91,16 @@ public class ConsultaService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			consulta = ConsultaDAO.addConsulta(jsonObject.getString("data"), 1, 1);
+			consulta = ConsultaDAO.addConsulta(jsonObject.getString("valor"),
+			jsonObject.getInt("idPaciente"), Integer.parseInt(jsonObject.getString("idDentista")));
 			System.out.println(consulta.toString());
 			// Response
 			jsonObject = new JSONObject();
+			jsonObject.put("id", consulta.getId());
 			jsonObject.put("data", consulta.getData());
+			jsonObject.put("valor", consulta.getValor());
+			jsonObject.put("idPaciente", consulta.getIdPaciente());
+			jsonObject.put("idDentista", consulta.getIdDentista());
 		} catch (JSONException e) {
 		}
 

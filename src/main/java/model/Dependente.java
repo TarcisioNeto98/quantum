@@ -4,7 +4,6 @@ public class Dependente {
 	int id;
 	String nome;
 	String cpf;
-	String cargo;
 	int idFuncionario;
 	
 	public String getNome() {
@@ -25,29 +24,23 @@ public class Dependente {
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
-	public String getCargo() {
-		return cargo;
-	}
-	public void setCargo(String cargo) {
-		this.cargo = cargo;
-	}
+	
 	public int getIdFuncionario() {
 		return idFuncionario;
 	}
 	public void setIdFuncionario(int idFuncionario) {
 		this.idFuncionario = idFuncionario;
 	}
-	public Dependente(int id, String nome, String cpf, String cargo, int idFuncionario) {
+	public Dependente(int id, String nome, String cpf, int idFuncionario) {
 		super();
 		this.id = id;
 		this.nome = nome;
 		this.cpf = cpf;
-		this.cargo = cargo;
 		this.idFuncionario = idFuncionario;
 	}
 	@Override
 	public String toString() {
-		return "Dependente [id=" + id + ", nome=" + nome + ", cpf=" + cpf + ", cargo=" + cargo + ", idFuncionario="
+		return "Dependente [id=" + id + ", nome=" + nome + ", cpf=" + cpf + ", idFuncionario="
 				+ idFuncionario + "]";
 	}
 	
