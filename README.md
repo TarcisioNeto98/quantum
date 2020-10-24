@@ -1,2 +1,2 @@
 # quantum
-Backend java, temporariamente em memória.
+Backend java, com funcionalidades básicas de banco de dados parcialmente adicionadas.
