@@ -25,76 +25,51 @@ public class PacienteService extends HttpServlet {
     public PacienteService() {
         super();
     }
-
+    
+    public static void enviarJSON(String json, HttpServletResponse response) throws IOException {
+    	response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().print(json);
+		response.getWriter().flush();
+    }
+    
+    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		//Quantidade
 		String path = request.getPathInfo();
 		
 		if(path.contains("quantidade")) {
+			System.out.println(path);
 			JSONObject json = new JSONObject();
 			int quantidade = PacienteDAO.quantidadePaciente();
 			json.put("quantidade", quantidade);
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().print(json.toString());
-			response.getWriter().flush();
+			try {
+				enviarJSON(json.toString(), response);
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
+			return;
+			
+		}
+		//id
+		else if(path.contains("id")) {
+			int id = Integer.parseInt(path.replace("/id/", ""));
+			Paciente paciente = PacienteDAO.getPaciente(id);
+			JSONObject json = new JSONObject();
+			json.put("nome", paciente.getNome());
+			json.put("id", paciente.getId());
+			json.put("email", paciente.getEmail());
+			json.put("cidade", paciente.getCidade());
+			json.put("cep", paciente.getCep());
+			json.put("estado", paciente.getEstado());
+			try {
+				enviarJSON(json.toString(), response);
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
 			return;
 		}
-	
-		// GET BY ID
-				/*String pathInfo = request.getPathInfo();
-
-				if (pathInfo != null) {
-					String[] params = pathInfo.split("/");
-
-					if (params.length > 0) {
-						Paciente paciente = PacienteDAO.getPaciente(Integer.parseInt(params[1]));
-
-						if (paciente != null) {
-							JSONObject jsonObject = new JSONObject();
-
-							jsonObject.put("id", paciente.getId());
-							jsonObject.put("nome", paciente.getNome());
-							jsonObject.put("email", paciente.getEmail());
-							jsonObject.put("cidade", paciente.getCidade());
-							jsonObject.put("estado", paciente.getEstado());
-							jsonObject.put("cep", paciente.getCep());
-
-							response.setContentType("application/json");
-							response.setCharacterEncoding("UTF-8");
-							response.getWriter().print(jsonObject.toString());
-							response.getWriter().flush();
-						}
-						return;
-					}
-				}*/
-				
-				/*
-				// GET BY NAME
-		        if (request.getParameter("login") != null) {
-		        	System.out.println(request.getParameter("login"));
-		        	System.out.println(request.getParameter("password"));
-		        	
-		            Paciente paciente = PacienteDAO.getPacienteByLogin(request.getParameter("login"));
-		 
-		            if (user != null) {
-		 
-		                JSONObject jsonObject = new JSONObject();
-		 
-		                jsonObject.put("id", user.getId());
-		                jsonObject.put("login", user.getLogin());
-		                jsonObject.put("password", user.getPassword());
-		 
-		                response.setContentType("application/json");
-		                response.setCharacterEncoding("UTF-8");
-		                response.getWriter().print(jsonObject.toString());
-		                response.getWriter().flush();
-		 
-		            }
-		            return;
-		        } */
-
-				// GET ALL
+		// Nome e email
 		try {
 			List<Paciente> list = PacienteDAO.getPacienteNomeEmail(request.getParameter("nome"),request.getParameter("email"));
 			JSONArray jArray = new JSONArray();
@@ -114,11 +89,8 @@ public class PacienteService extends HttpServlet {
 			}
 					
 			System.out.println(jArray.toString());
-					
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().print(jArray.toString());
-			response.getWriter().flush();
+			enviarJSON(jArray.toString(), response);
+			
 		} catch (Exception e) {
 
 		}
@@ -152,54 +124,41 @@ public class PacienteService extends HttpServlet {
 		} catch (JSONException e) {
 		}
 
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(jsonObject.toString());
-		response.getWriter().flush();
-		// UPDATE BY ID
-        /*String pathInfo = request.getPathInfo();
- 
-        if (pathInfo != null) {
-            String[] params = pathInfo.split("/");
- 
-            if (params.length > 0) {
-                StringBuffer jb = new StringBuffer();
-                String line = null;
-                try {
-                    BufferedReader reader = request.getReader();
-                    while ((line = reader.readLine()) != null)
-                        jb.append(line);
-                } catch (Exception e) {
-                }
- 
-                Paciente paciente = null;
-                JSONObject jsonObject = null;
- 
-                try {
-                    // Request
-                    jsonObject = new JSONObject(jb.toString());
-                    paciente = PacienteDAO.updatePaciente(Integer.parseInt(params[1]), jsonObject.getString("nome"),
-                    		jsonObject.getString("email"), jsonObject.getString("cidade"),
-                    		jsonObject.getString("estado"), jsonObject.getString("cep"));
- 
-                    // Response
-                    jsonObject = new JSONObject();
-                    jsonObject.put("id", paciente.getId());
-                    jsonObject.put("login", paciente.getNome());
-                    jsonObject.put("password", paciente.getEmail());
-                    jsonObject.put("cidade", paciente.getCidade());
-                    jsonObject.put("estado", paciente.getEstado());
-                    jsonObject.put("cep", paciente.getCep());
- 
-                } catch (JSONException e) {
-                }
- 
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
-            }
-        }*/
+		enviarJSON(jsonObject.toString(), response);
+
+	}
+
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = req.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+		}
+
+		Paciente paciente = null;
+		JSONObject jsonObject = null;
+		try {
+			// Request
+			jsonObject = new JSONObject(jb.toString());
+			paciente = PacienteDAO.updatePaciente(jsonObject.getInt("id"), jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("cidade"),jsonObject.getString("estado"), jsonObject.getString("cep"));
+			System.out.println(paciente.toString());
+			// Response
+			jsonObject = new JSONObject();
+			jsonObject.put("id", paciente.getId());
+			jsonObject.put("nome", paciente.getNome());
+			jsonObject.put("cidade", paciente.getCidade());
+			jsonObject.put("estado", paciente.getEstado());
+			jsonObject.put("cep", paciente.getCep());
+		} catch (JSONException e) {
+		}
+
+		enviarJSON(jsonObject.toString(), resp);
+
 	}
 	
 	@Override

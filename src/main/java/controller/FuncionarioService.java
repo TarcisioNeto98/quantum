@@ -41,6 +41,25 @@ public class FuncionarioService extends HttpServlet {
 			return;
 		}
 		
+		if(path.contains("id")) {
+			JSONObject json = new JSONObject();
+			int id = Integer.parseInt(path.replace("/id/", ""));
+			Funcionario funcionario = FuncionarioDAO.getFuncionario(id);
+			json.put("id", funcionario.getId());
+			json.put("nome", funcionario.getNome());
+			json.put("email", funcionario.getEmail());
+			json.put("endereco", funcionario.getEndereco());
+			json.put("cidade", funcionario.getCidade());
+			json.put("estado", funcionario.getEstado());
+			json.put("cep", funcionario.getCep());
+			json.put("salario", funcionario.getSalario());
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(json.toString());
+			response.getWriter().flush();
+			return;
+		}
+		
 		// GET ALL
 		/*List<Funcionario> list = FuncionarioDAO.getAllFuncionarios();
 
@@ -138,56 +157,50 @@ public class FuncionarioService extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().print(jsonObject.toString());
 		response.getWriter().flush();
-		// UPDATE BY ID
-        /*String pathInfo = request.getPathInfo();
- 
-        if (pathInfo != null) {
-            String[] params = pathInfo.split("/");
- 
-            if (params.length > 0) {
-                StringBuffer jb = new StringBuffer();
-                String line = null;
-                try {
-                    BufferedReader reader = request.getReader();
-                    while ((line = reader.readLine()) != null)
-                        jb.append(line);
-                } catch (Exception e) {
-                }
- 
-                Funcionario funcionario = null;
-                JSONObject jsonObject = null;
- 
-                try {
-                    // Request
-                    jsonObject = new JSONObject(jb.toString());
-                    funcionario = FuncionarioDAO.updateFuncionario(Integer.parseInt(params[1]),
-                    		jsonObject.getString("nome"),
-                    		jsonObject.getString("endereco"),
-                    		jsonObject.getString("cidade"),
-                    		jsonObject.getString("estado"),
-                    		jsonObject.getString("cep"),
-                    		jsonObject.getDouble("salario"));
-                                   
-                    // Response
-                    jsonObject.put("id", funcionario.getId());
-					jsonObject.put("nome", funcionario.getNome());
-					jsonObject.put("endereco", funcionario.getEndereco());
-					jsonObject.put("cidade", funcionario.getCidade());
-					jsonObject.put("estado", funcionario.getEstado());
-					jsonObject.put("cep", funcionario.getCep());
-					jsonObject.put("salario", funcionario.getSalario());
- 
-                } catch (JSONException e) {
-                }
- 
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
-            }
-        }*/
+		
 	}
 	
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = req.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+		}
+
+		Funcionario funcionario = null;
+		JSONObject jsonObject = null;
+		try {
+			// Request
+			jsonObject = new JSONObject(jb.toString());
+			funcionario = FuncionarioDAO.updateFuncionario(jsonObject.getInt("id"), jsonObject.getString("nome"), 
+			jsonObject.getString("email"), jsonObject.getString("endereco"), jsonObject.getString("cidade"),
+			jsonObject.getString("estado"), jsonObject.getString("cep"), jsonObject.getString("salario"));
+			// Response
+			jsonObject = new JSONObject();
+			jsonObject.put("id", funcionario.getId());
+			jsonObject.put("nome", funcionario.getNome());
+			jsonObject.put("email", funcionario.getEmail());
+			jsonObject.put("endereco", funcionario.getEndereco());
+			jsonObject.put("cidade", funcionario.getCidade());
+			jsonObject.put("estado", funcionario.getEstado());
+			jsonObject.put("cep", funcionario.getCep());
+			jsonObject.put("salario", funcionario.getSalario());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		resp.setContentType("application/json");
+		resp.setCharacterEncoding("UTF-8");
+		resp.getWriter().print(jsonObject.toString());
+		resp.getWriter().flush();
+
+	}
+
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		

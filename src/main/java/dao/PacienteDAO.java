@@ -15,11 +15,23 @@ import util.DbUtil;
 
 public class PacienteDAO {
 	private static final Map<Integer, Paciente> userMap = new HashMap<Integer, Paciente>();
-	private static int i = 4;
 	private static Connection connection = DbUtil.getConnection();
 	
 	public static Paciente getPaciente(int id) {
-		return userMap.get(id);
+		Paciente paciente = null;
+		try {
+        	PreparedStatement pStmt = connection.prepareStatement("SELECT * from Paciente where id=?");
+        	pStmt.setInt(1, id);
+        	ResultSet rs = pStmt.executeQuery();
+        	if(rs.next()) {
+                paciente = new Paciente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), rs.getString("cidade"),
+                rs.getString("estado"), rs.getString("cep"));
+                return paciente;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return paciente;
 	}
 	
 	public static int quantidadePaciente() {
@@ -76,10 +88,29 @@ public class PacienteDAO {
 	}
 
 	public static Paciente updatePaciente(int id, String nome, String email, String cidade, String estado, String cep) {
-		Paciente paciente = new Paciente(id, nome, email, cidade, estado, cep);
-		userMap.put(paciente.getId(), paciente);
-		return paciente;
+		try {
+            PreparedStatement pStmt = connection.prepareStatement("UPDATE Paciente SET nome = ?, email = ?, cep = ?, cidade = ?,"
+            + "estado = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
+            
+            pStmt.setString(1, nome);
+            pStmt.setString(2, email);
+            pStmt.setString(3, cep);
+            pStmt.setString(4, cidade);
+            pStmt.setString(5, estado);
+            pStmt.setInt(6, id);
+            pStmt.executeUpdate();
+            ResultSet rs = pStmt.getGeneratedKeys();
+            
+            if (rs.next()) {
+                return new Paciente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"),rs.getString("cidade"),
+                rs.getString("estado"), rs.getString("cep"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
+	
 
 	public static void deletePaciente(int id) {
 		try {

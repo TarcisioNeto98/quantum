@@ -14,61 +14,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dao.PacienteDAO;
 import dao.UserDAO;
 import model.User;
 
 @WebServlet ("/api/users/*")
 public class UserService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+	
     public UserService() {
         super();
         // TODO Auto-generated constructor stub
     }
-
+    
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// GET BY ID
-		/*String pathInfo = request.getPathInfo();
-
-		if (pathInfo != null) {
-			String[] params = pathInfo.split("/");
-
-			if (params.length > 0) {
-				User user = UserDAO.getUser(Integer.parseInt(params[1]));
-
-				if (user != null) {
-					JSONObject jsonObject = new JSONObject();
-
-					jsonObject.put("id", user.getId());
-					jsonObject.put("email", user.getLogin());
-					jsonObject.put("password", user.getPassword());
-					jsonObject.put("endereco", user.getEndereco());
-					jsonObject.put("cep", user.getCep());
-					jsonObject.put("cidade", user.getCidade());
-					jsonObject.put("estado", user.getEstado());
-
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					response.getWriter().print(jsonObject.toString());
-					response.getWriter().flush();
-				}
-				return;
-			}
-		}*/
 		
 		// GET BY NAME
-        /*if (request.getParameter("email") != null) {
-        	System.out.println(request.getParameter("email"));
-        	System.out.println(request.getParameter("password"));
+        if (request.getParameter("email") != null && request.getParameter("password") != null) {
         	
             User user = UserDAO.getUserByLoginAndPassword(request.getParameter("email"), request.getParameter("password"));
  
             if (user != null) {
- 
                 JSONObject jsonObject = new JSONObject();
  
 				jsonObject.put("id", user.getId());
@@ -79,21 +46,14 @@ public class UserService extends HttpServlet {
 				jsonObject.put("cidade", user.getCidade());
 				jsonObject.put("estado", user.getEstado());
 				
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
- 
+				PacienteService.enviarJSON(jsonObject.toString(), response);
             }
             else {
             	JSONObject jsonObject = new JSONObject();
-            	response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
+            	PacienteService.enviarJSON(jsonObject.toString(), response);
             }
             return;
-        }*/
+        }
 
 		// GET ALL
 		/*List<User> list = UserDAO.getAllUsers();
@@ -127,32 +87,6 @@ public class UserService extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
-		/*if (request.getParameter("email") != null) {
-        	System.out.println(request.getParameter("email"));
-        	System.out.println(request.getParameter("password"));
-        	
-            User user = UserDAO.getUserByLoginAndPassword(request.getParameter("email"), request.getParameter("password"));
- 
-                JSONObject jsonObject = new JSONObject();
- 
-				jsonObject.put("id", user.getId());
-				jsonObject.put("email", user.getLogin());
-				jsonObject.put("password", user.getPassword());
-				jsonObject.put("endereco", user.getEndereco());
-				jsonObject.put("cep", user.getCep());
-				jsonObject.put("cidade", user.getCidade());
-				jsonObject.put("estado", user.getEstado());
-				
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
- 
-            return;
-        */
-
-		
 		StringBuffer jb = new StringBuffer();
 		String line = null;
 		try {
@@ -167,9 +101,15 @@ public class UserService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			user = UserDAO.addUser(jsonObject.getString("email"), jsonObject.getString("nome"), jsonObject.getString("password"),
+			user = UserDAO.addUser(jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("password"),
 			jsonObject.getString("endereco"), jsonObject.getString("cep"), jsonObject.getString("cidade"),
 			jsonObject.getString("estado"));
+			
+			if(user == null) {
+				jsonObject.put("id", -1);
+				PacienteService.enviarJSON(jsonObject.toString(), response);
+				return;
+			}
 			System.out.println(user.toString());
 			// Response
 			jsonObject = new JSONObject();
@@ -181,14 +121,9 @@ public class UserService extends HttpServlet {
 			jsonObject.put("cep", user.getCep());
 			jsonObject.put("cidade", user.getCidade());
 			jsonObject.put("estado", user.getEstado());
-
 		} catch (JSONException e) {
 		}
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(jsonObject.toString());
-		response.getWriter().flush();
+		PacienteService.enviarJSON(jsonObject.toString(), response);
 	}
 	
 	@Override
