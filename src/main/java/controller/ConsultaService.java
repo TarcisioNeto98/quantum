@@ -37,53 +37,6 @@ public class ConsultaService extends HttpServlet {
 			return;
 		}
 		
-		// GET BY ID
-		/*String pathInfo = request.getPathInfo();
-
-		if (pathInfo != null) {
-			String[] params = pathInfo.split("/");
-
-			if (params.length > 0) {
-				Consulta consulta = ConsultaDAO.getConsulta(Integer.parseInt(params[1]));
-
-				if (consulta != null) {
-					JSONObject jsonObject = new JSONObject();
-
-					jsonObject.put("id", consulta.getId());
-					jsonObject.put("data", consulta.getData());
-					jsonObject.put("idPaciente", consulta.getIdPaciente());
-					jsonObject.put("idDentista", consulta.getIdDentista());
-
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					response.getWriter().print(jsonObject.toString());
-					response.getWriter().flush();
-				}
-				return;
-			}
-		}
-		
-		// GET ALL
-		List<Consulta> list = ConsultaDAO.getAllConsultas();
-
-		try {
-			JSONArray jArray = new JSONArray();
-
-			for (Consulta consulta : list) {
-				JSONObject jsonObject = new JSONObject();
-
-				jsonObject.put("data", consulta.getData());
-
-				jArray.put(jsonObject);
-			}
-
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().print(jArray.toString());
-			response.getWriter().flush();
-		} catch (Exception e) {
-
-		}*/
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -102,7 +55,7 @@ public class ConsultaService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			consulta = ConsultaDAO.addConsulta(jsonObject.getString("valor"),
+			consulta = ConsultaDAO.addConsulta(jsonObject.getString("valor"), jsonObject.getString("data"),
 			jsonObject.getInt("idPaciente"), Integer.parseInt(jsonObject.getString("idDentista")));
 			System.out.println(consulta.toString());
 			// Response
@@ -114,7 +67,6 @@ public class ConsultaService extends HttpServlet {
 			jsonObject.put("idDentista", consulta.getIdDentista());
 		} catch (JSONException e) {
 		}
-
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().print(jsonObject.toString());

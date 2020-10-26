@@ -1,6 +1,13 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Procedimento")
 public class Procedimento {
+	@Id
+	@GeneratedValue
 	int id;
 	String nome;
 	double valor;
@@ -28,6 +35,17 @@ public class Procedimento {
 		return descricao;
 	}
 	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+	
+	public Procedimento() {
+		super();
+	}
+	
+	public Procedimento(String nome, double valor, String descricao) {
+		super();
+		this.nome = nome;
+		this.valor = valor;
 		this.descricao = descricao;
 	}
 	public Procedimento(int id, String nome, double valor, String descricao) {

@@ -1,132 +1,86 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import model.Funcionario;
-import model.Paciente;
-import util.DbUtil;
 
 public class FuncionarioDAO {
 	private static final Map<Integer, Funcionario> userMap = new HashMap<Integer, Funcionario>();
-	private static int i = 4;
-	private static Connection connection = DbUtil.getConnection();
 	
+	static EntityManagerFactory factory = Persistence.createEntityManagerFactory("clinicaodontologica");
+    static EntityManager manager;
 
 	public static Funcionario getFuncionario(int id) {
 		Funcionario funcionario = null;
-		try {
-        	PreparedStatement pStmt = connection.prepareStatement("SELECT * from Funcionario where id=?");
-        	pStmt.setInt(1, id);
-        	ResultSet rs = pStmt.executeQuery();
-        	if(rs.next()) {
-                funcionario = new Funcionario(rs.getInt("id"), rs.getString("nome"),rs.getString("email"), rs.getString("endereco"),rs.getString("cidade"), 
-                        rs.getString("estado"), rs.getString("cep"), Double.parseDouble(rs.getString("salario")));
-                return funcionario;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		
+		manager = factory.createEntityManager();
+		funcionario = manager.find(Funcionario.class, id);
+		manager.close();
 		return funcionario;
 	}
 	
 	public static int quantidadeFuncionario() {
-		try {
-        	PreparedStatement pStmt = connection.prepareStatement("SELECT COUNT(*) AS quantidade from Funcionario");
-        	ResultSet rs = pStmt.executeQuery();
-        	
-        	if(rs.next()) return rs.getInt("quantidade");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-		return 0;
+		manager = factory.createEntityManager();
+        String quantidade = manager.createQuery("SELECT COUNT(*) FROM Funcionario").getSingleResult().toString();
+        manager.close();
+        
+        return Integer.parseInt(quantidade);
 	}
 	
-	public static Funcionario addFuncionario(String nome, String email, String endereco, String cidade, String estado, String cep, String salario) {
-		try {
-            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Funcionario(nome, endereco, cep, cidade, estado, salario, email) " 
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            pStmt.setString(1, nome);
-            pStmt.setString(2, endereco);
-            pStmt.setString(3, cep);
-            pStmt.setString(4, cidade);
-            pStmt.setString(5, estado);
-            pStmt.setString(6, salario);
-            pStmt.setString(7, email);
-            pStmt.executeUpdate();
-            ResultSet rs = pStmt.getGeneratedKeys();
-            
-            if (rs.next()) {
-                return new Funcionario(rs.getInt("id"), rs.getString("nome"),rs.getString("email"), rs.getString("endereco"),rs.getString("cidade"), 
-                rs.getString("estado"), rs.getString("cep"), Double.parseDouble(rs.getString("salario")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+	public static Funcionario addFuncionario(String nome, String email, String endereco, String cidade, String estado, String cep, 
+		String salario) {
+		Funcionario funcionario = new Funcionario(nome, email, endereco, cidade, estado, cep, Double.parseDouble(salario));
+		 
+        manager = factory.createEntityManager();
+        manager.getTransaction().begin();
+        manager.persist(funcionario);
+        manager.getTransaction().commit();
+        manager.close();
+        
+        return funcionario;
 	}
 	
 	public static List<Funcionario> getFuncionarioNomeEmail(String nome, String email){
 		List<Funcionario> funcionarios = new ArrayList<Funcionario>();
-        try {
-        	PreparedStatement pStmt = connection.prepareStatement("SELECT * from Funcionario where email=? and nome=?");
-        	pStmt.setString(1, email);
-        	pStmt.setString(2, nome);
-        	ResultSet rs = pStmt.executeQuery();
-        	
-        	while (rs.next()) {
-                Funcionario funcionario = new Funcionario(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), 
-                rs.getString("endereco"), rs.getString("cidade"), rs.getString("estado"), rs.getString("cep"),
-                Double.parseDouble(rs.getString("salario")));
-                funcionarios.add(funcionario);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
-        return funcionarios;
+		
+		manager = factory.createEntityManager();
+		
+		funcionarios = manager.createQuery("from Funcionario WHERE nome=?1 AND email=?2", Funcionario.class).setParameter(1, nome).
+		setParameter(2, email).getResultList();
+        
+		manager.close();
+		
+		return funcionarios;
 	}
 
 	public static Funcionario updateFuncionario(int id, String nome, String email, String endereco, String cidade, String estado, String cep, String salario) {
-		try {
-            PreparedStatement pStmt = connection.prepareStatement("UPDATE Funcionario SET nome=?, endereco=?, cep=?, cidade=?, estado=?, salario=?, email=? " 
-            + "WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
-            pStmt.setString(1, nome);
-            pStmt.setString(2, endereco);
-            pStmt.setString(3, cep);
-            pStmt.setString(4, cidade);
-            pStmt.setString(5, estado);
-            pStmt.setString(6, salario);
-            pStmt.setString(7, email);
-            pStmt.setInt(8, id);
-            pStmt.executeUpdate();
-            ResultSet rs = pStmt.getGeneratedKeys();
-            
-            if (rs.next()) {
-                return new Funcionario(rs.getInt("id"), rs.getString("nome"),rs.getString("email"), rs.getString("endereco"),rs.getString("cidade"), 
-                rs.getString("estado"), rs.getString("cep"), Double.parseDouble(rs.getString("salario")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+		
+		Funcionario funcionario = new Funcionario(id, nome, email, endereco, cidade, estado, cep, Double.parseDouble(salario));
+		manager = factory.createEntityManager();
+        manager.getTransaction().begin();
+        manager.merge(funcionario);
+        manager.getTransaction().commit();
+        manager.close();
+        
+        return funcionario;
 	}
 
 	public static void deleteFuncionario(int id) {
-		try {
-			PreparedStatement pStmt = connection.prepareStatement("DELETE FROM Funcionario WHERE id=?");
-        	pStmt.setInt(1, id);
-        	pStmt.executeUpdate();
-		}catch(SQLException e){
-			e.printStackTrace();
-		}
+		manager = factory.createEntityManager();
+        
+        Funcionario funcionario = manager.find(Funcionario.class, id);
+        
+        manager.getTransaction().begin();
+        manager.remove(funcionario);
+        manager.getTransaction().commit();
+        manager.close();
 	}
 
 	public static List<Funcionario> getAllFuncionarios() {

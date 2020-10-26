@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import model.Consulta;
 import util.DbUtil;
 
@@ -18,43 +22,36 @@ public class ConsultaDAO {
 	private static int i = 4;
 	private static Connection connection = DbUtil.getConnection();
 	
+	static EntityManagerFactory factory = Persistence.createEntityManagerFactory("clinicaodontologica");
+    static EntityManager manager;
+	
 
 	public static Consulta getConsulta(int id) {
 		return userMap.get(id);
 	}
 	
 	public static int quantidadeConsulta() {
-		try {
-        	PreparedStatement pStmt = connection.prepareStatement("SELECT COUNT(*) AS quantidade from Consulta");
-        	ResultSet rs = pStmt.executeQuery();
-        	
-        	if(rs.next()) return rs.getInt("quantidade");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-		return 0;
+		manager = factory.createEntityManager();
+		System.out.println(manager.createQuery("SELECT COUNT(*) FROM Consulta").getSingleResult());
+        String quantidade = manager.createQuery("SELECT COUNT(*) FROM Consulta").getSingleResult().toString();
+        
+        manager.close();
+        
+        return Integer.parseInt(quantidade);
 	}
 
-	public static Consulta addConsulta(String valor, int idPaciente, int idDentista) {
+	public static Consulta addConsulta(String valor, String data, int idPaciente, int idDentista) {
 		
-		try {
-            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Consulta(valor, idPaciente, idDentista) " 
-            + "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            
-            pStmt.setString(1, valor);
-            pStmt.setInt(2, idPaciente);
-            pStmt.setInt(3, idDentista);
-            pStmt.executeUpdate();
-            ResultSet rs = pStmt.getGeneratedKeys();
-            
-            if (rs.next()) {
-                return new Consulta(rs.getInt("id"), rs.getString("valor"), rs.getDate("date").toString(), 
-                rs.getInt("idPaciente"),rs.getInt("idDentista"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+		Consulta consulta = new Consulta(valor, data, idPaciente, idDentista);
+		 
+        manager = factory.createEntityManager();
+        manager.getTransaction().begin();
+        manager.persist(consulta);
+        manager.getTransaction().commit();
+        manager.close();
+        
+        return consulta;
+		
 	}
 
 	public static Consulta updateConsulta(int id, String data, int idPaciente, int idDentista) {

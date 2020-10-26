@@ -1,65 +1,39 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import model.User;
-import util.DbUtil;
 
 public class UserDAO {
-
-    private static Connection connection = DbUtil.getConnection();
+    
+    static EntityManagerFactory factory = Persistence.createEntityManagerFactory("clinicaodontologica");
+    static EntityManager manager;
 
 	public static User addUser(String nome, String login, String password, String endereco, String cep, String cidade, String estado) {
-        try {
-        	PreparedStatement pStmt = connection.prepareStatement("SELECT * FROM Usuario WHERE password=?");
-        	pStmt.setString(1, password);
-        	ResultSet rs = pStmt.executeQuery();
-        	
-        	if(rs.next()) {
-        		return null;
-        	}
-        	
-            pStmt = connection.prepareStatement("INSERT INTO Usuario(nome, email, password, endereco, cep, cidade, estado) " 
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            pStmt.setString(1, nome);
-            pStmt.setString(2, login);
-            pStmt.setString(3, password);
-            pStmt.setString(4, endereco);
-            pStmt.setString(5, cep);
-            pStmt.setString(6, cidade);
-            pStmt.setString(7, estado);
-            pStmt.executeUpdate();
-            rs = pStmt.getGeneratedKeys();
-            if (rs.next()) {
-                return new User(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), rs.getString("password"), rs.getString("endereco")
-                ,rs.getString("cep"), rs.getString("cidade"), rs.getString("estado"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
-        return null;
+		User usuario = new User(nome, login, password, endereco, cep, cidade, estado);
+        manager = factory.createEntityManager();
+        
+		try{
+			User user = manager.createQuery("from Usuario WHERE password=?1", User.class).setParameter(1, password).getSingleResult();
+			if(user != null) return null;
+		}catch(Exception e) {
+		}
+		
+        manager.getTransaction().begin();
+        manager.persist(usuario);
+        manager.getTransaction().commit();
+        manager.close();
+        return usuario;
 	}
 	
 	public static User getUserByLoginAndPassword(String email, String password) {
-		try {
-			PreparedStatement pStmt = connection.prepareStatement("SELECT * FROM Usuario WHERE password=? and email=?");
-	    	pStmt.setString(1, password);
-	    	pStmt.setString(2, email);
-	    	ResultSet rs = pStmt.executeQuery();
-	    	if(rs.next()) {
-	    		System.out.println(rs.getInt("id"));
-	    		return new User(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), rs.getString("password"),
-	    		rs.getString("endereco"),rs.getString("cep"), rs.getString("cidade"), rs.getString("estado"));
-	    	}
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+		manager = factory.createEntityManager();
+		User usuario = manager.createQuery("from Usuario WHERE email=?1 AND password=?2", User.class).setParameter(1, email).
+		setParameter(2, email).getSingleResult();
+		manager.close();
+		return usuario;
 	}
-	
 }

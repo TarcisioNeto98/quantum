@@ -1,6 +1,14 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Consulta")
 public class Consulta {
+	
+	@Id
+	@GeneratedValue
 	int id;
 	String data;
 	String valor;
@@ -35,6 +43,17 @@ public class Consulta {
 		return idDentista;
 	}
 	public void setIdDentista(int idDentista) {
+		this.idDentista = idDentista;
+	}
+	
+	public Consulta() {
+		super();
+	}
+	public Consulta(String data, String valor, int idPaciente, int idDentista) {
+		super();
+		this.data = data;
+		this.valor = valor;
+		this.idPaciente = idPaciente;
 		this.idDentista = idDentista;
 	}
 	public Consulta(int id,String valor, String data, int idPaciente, int idDentista) {

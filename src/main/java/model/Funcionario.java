@@ -1,6 +1,14 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Funcionario")
 public class Funcionario {
+	
+	@Id
+	@GeneratedValue
 	int id;
 	String nome;
 	String email;
@@ -68,6 +76,23 @@ public class Funcionario {
 		this.estado = estado;
 		this.cep = cep;
 		this.salario = salario;
+	}
+	
+	public Funcionario(String nome, String email, String endereco, String cidade, String estado, String cep,
+			Double salario) {
+		super();
+		this.nome = nome;
+		this.email = email;
+		this.endereco = endereco;
+		this.cidade = cidade;
+		this.estado = estado;
+		this.cep = cep;
+		this.salario = salario;
+	}
+	
+	
+	public Funcionario() {
+		super();
 	}
 	
 	@Override

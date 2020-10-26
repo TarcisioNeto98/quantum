@@ -1,6 +1,14 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Dependente")
 public class Dependente {
+	
+	@Id
+	@GeneratedValue
 	int id;
 	String nome;
 	String cpf;
@@ -34,6 +42,17 @@ public class Dependente {
 	public Dependente(int id, String nome, String cpf, int idFuncionario) {
 		super();
 		this.id = id;
+		this.nome = nome;
+		this.cpf = cpf;
+		this.idFuncionario = idFuncionario;
+	}
+	
+	public Dependente() {
+		super();
+	}
+	
+	public Dependente(String nome, String cpf, int idFuncionario) {
+		super();
 		this.nome = nome;
 		this.cpf = cpf;
 		this.idFuncionario = idFuncionario;

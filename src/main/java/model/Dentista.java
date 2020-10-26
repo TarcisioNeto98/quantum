@@ -1,11 +1,28 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Dentista")
 public class Dentista {
 
+	@Id
+	@GeneratedValue
 	private int id;
 	private String nome;
 	private String especialidade;
 	
+	public Dentista() {
+		super();
+	}
+
+	public Dentista(String nome, String especialidade) {
+		super();
+		this.nome = nome;
+		this.especialidade = especialidade;
+	}
+
 	public Dentista(int id, String nome, String especialidade) {
 		super();
 		this.id = id;

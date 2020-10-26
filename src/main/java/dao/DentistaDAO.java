@@ -8,6 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import model.Dentista;
 import util.DbUtil;
 
@@ -15,38 +19,27 @@ import util.DbUtil;
 public class DentistaDAO {
 	
 	private static Connection connection = DbUtil.getConnection();
-	
+	static EntityManagerFactory factory = Persistence.createEntityManagerFactory("clinicaodontologica");
+    static EntityManager manager;
+    
 	public static Dentista addDentista(String nome, String especialidade) {
-		try {
-            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Dentista(nome, especialidade) " 
-            + "VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-            pStmt.setString(1, nome);
-            pStmt.setString(2, especialidade);
-            pStmt.executeUpdate();
-            ResultSet rs = pStmt.getGeneratedKeys();
-            
-            if (rs.next()) {
-                return new Dentista(rs.getInt("id"), rs.getString("nome"), rs.getString("especialidade"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+		Dentista dentista = new Dentista(nome, especialidade);
+		
+		manager = factory.createEntityManager();
+        manager.getTransaction().begin();
+        manager.persist(dentista);
+        manager.getTransaction().commit();
+        manager.close();
+        
+        return dentista;
 	}
 	
 	public static List<Dentista> getAllDentistas() {
-        List<Dentista> dentistas = new ArrayList<Dentista>();
-        try {
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from Dentista ORDER BY id");
-            while (rs.next()) {
-                Dentista dentista = new Dentista(rs.getInt("id"), rs.getString("nome"), rs.getString("especialidade"));
-                dentistas.add(dentista);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
+        List<Dentista> dentistas = null;
+        
+        manager = factory.createEntityManager();
+        dentistas = manager.createQuery("FROM Dentista", Dentista.class).getResultList();
+        manager.close();
         return dentistas;
     }
 }

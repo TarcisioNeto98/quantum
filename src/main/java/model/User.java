@@ -1,9 +1,17 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Usuario")
 public class User {
+	
+	@Id
+	@GeneratedValue
 	int id;
 	String nome;
-	String login;
+	String email;
 	String password;
 	String endereco;
 	String cep;
@@ -11,14 +19,29 @@ public class User {
 	
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", password=" + password + ", endereco=" + endereco + ", cep=" + cep + ", cidade=" + cidade + ", estado=" + estado + "]";
+		return "User [id=" + id + ", email=" + email + ", password=" + password + ", endereco=" + endereco + ", cep=" + cep + ", cidade=" + cidade + ", estado=" + estado + "]";
 	}
 	
-	public User(int id, String nome, String login, String password, String endereco, String cep, String cidade, String estado) {
+	public User() {
+		super();
+	}
+	
+	public User(int id, String nome, String email, String password, String endereco, String cep, String cidade, String estado) {
 		super();
 		this.id = id;
 		this.nome = nome;
-		this.login = login;
+		this.email = email;
+		this.password = password;
+		this.endereco = endereco;
+		this.cep = cep;
+		this.cidade = cidade;
+		this.estado = estado;
+	}
+	
+	public User(String nome, String login, String password, String endereco, String cep, String cidade, String estado) {
+		super();
+		this.nome = nome;
+		this.email = login;
 		this.password = password;
 		this.endereco = endereco;
 		this.cep = cep;
@@ -32,11 +55,11 @@ public class User {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getLogin() {
-		return login;
+	public String getEmail() {
+		return email;
 	}
-	public void setLogin(String login) {
-		this.login = login;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public String getEndereco() {
 		return endereco;

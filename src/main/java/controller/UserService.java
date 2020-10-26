@@ -39,7 +39,7 @@ public class UserService extends HttpServlet {
                 JSONObject jsonObject = new JSONObject();
  
 				jsonObject.put("id", user.getId());
-				jsonObject.put("email", user.getLogin());
+				jsonObject.put("email", user.getEmail());
 				jsonObject.put("password", user.getPassword());
 				jsonObject.put("endereco", user.getEndereco());
 				jsonObject.put("cep", user.getCep());
@@ -65,7 +65,7 @@ public class UserService extends HttpServlet {
 				JSONObject jsonObject = new JSONObject();
 
 				jsonObject.put("id", user.getId());
-				jsonObject.put("email", user.getLogin());
+				jsonObject.put("email", user.getEmail());
 				jsonObject.put("password", user.getPassword());
 				jsonObject.put("endereco", user.getEndereco());
 				jsonObject.put("cep", user.getCep());
@@ -114,8 +114,8 @@ public class UserService extends HttpServlet {
 			// Response
 			jsonObject = new JSONObject();
 			jsonObject.put("id", user.getId());
-			jsonObject.put("nome", user.getLogin());
-			jsonObject.put("email", user.getLogin());
+			jsonObject.put("nome", user.getNome());
+			jsonObject.put("email", user.getEmail());
 			jsonObject.put("password", user.getPassword());
 			jsonObject.put("endereco", user.getEndereco());
 			jsonObject.put("cep", user.getCep());
@@ -156,7 +156,7 @@ public class UserService extends HttpServlet {
                     
                     jsonObject = new JSONObject();
     				jsonObject.put("id", user.getId());
-    				jsonObject.put("email", user.getLogin());
+    				jsonObject.put("email", user.getEmail());
     				jsonObject.put("password", user.getPassword());
     				jsonObject.put("endereco", user.getEndereco());
     				jsonObject.put("cep", user.getCep());

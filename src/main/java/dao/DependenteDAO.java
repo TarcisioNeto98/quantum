@@ -1,48 +1,36 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import model.Dependente;
-import model.Paciente;
-import util.DbUtil;
 
 public class DependenteDAO {
 	private static final Map<Integer, Dependente> userMap = new HashMap<Integer, Dependente>();
-	private static int i = 4;
-	private static Connection connection = DbUtil.getConnection();
 	
-	
+	static EntityManagerFactory factory = Persistence.createEntityManagerFactory("clinicaodontologica");
+    static EntityManager manager;
+    
 	public static Dependente getDependente(int id) {
 		return userMap.get(id);
 	}
 
 	public static Dependente addDependente(String nome, String cpf, int idFuncionario) {
-		try {
-            PreparedStatement pStmt = connection.prepareStatement("INSERT INTO Dependente(nome, cpf, idFuncionario) " 
-            + "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            
-            pStmt.setString(1, nome);
-            pStmt.setString(2, cpf);
-            pStmt.setInt(3, idFuncionario);
-            
-            pStmt.executeUpdate();
-            ResultSet rs = pStmt.getGeneratedKeys();
-            
-            if (rs.next()) {
-                return new Dependente(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"),rs.getInt("idFuncionario"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+		Dependente dependente = new Dependente(nome, cpf, idFuncionario);
+		manager = factory.createEntityManager();
+		manager.getTransaction().begin();
+		manager.persist(dependente);
+		manager.getTransaction().commit();
+		manager.close();
+		
+		return dependente;
 	}
 
 	public static Dependente updateDependente(int id, String nome, String cpf, String cargo, int idFuncionario) {

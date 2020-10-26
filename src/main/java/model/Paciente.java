@@ -1,6 +1,14 @@
 package model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name="Paciente")
 public class Paciente {
+	
+	@Id
+	@GeneratedValue
 	int id;
 	String nome;
 	String email;
@@ -52,6 +60,20 @@ public class Paciente {
 		this.estado = estado;
 		this.cep = cep;
 	}
+	
+	public Paciente(String nome, String email, String cidade, String estado, String cep) {
+		super();
+		this.nome = nome;
+		this.email = email;
+		this.cidade = cidade;
+		this.estado = estado;
+		this.cep = cep;
+	}
+	
+	public Paciente() {
+		super();
+	}
+	
 	@Override
 	public String toString() {
 		return "Paciente [id=" + id + ", nome=" + nome + ", email=" + email + ", cidade=" + cidade + ", estado="
