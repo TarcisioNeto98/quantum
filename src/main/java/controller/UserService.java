@@ -2,7 +2,6 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,13 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import dao.PacienteDAO;
 import dao.UserDAO;
 import model.User;
+import util.Validar;
 
 @WebServlet ("/api/users/*")
 public class UserService extends HttpServlet {
@@ -32,7 +30,6 @@ public class UserService extends HttpServlet {
 		
 		// GET BY NAME
         if (request.getParameter("email") != null && request.getParameter("password") != null) {
-        	
             User user = UserDAO.getUserByLoginAndPassword(request.getParameter("email"), request.getParameter("password"));
  
             if (user != null) {
@@ -101,29 +98,55 @@ public class UserService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			user = UserDAO.addUser(jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("password"),
-			jsonObject.getString("endereco"), jsonObject.getString("cep"), jsonObject.getString("cidade"),
-			jsonObject.getString("estado"));
-			
-			if(user == null) {
-				jsonObject.put("id", -1);
-				PacienteService.enviarJSON(jsonObject.toString(), response);
-				return;
+			System.out.println(Validar.nome(jsonObject.getString("nome")));
+			System.out.println(Validar.cep(jsonObject.getString("cep")));
+			System.out.println(Validar.endereco(jsonObject.getString("endereco")));
+			System.out.println(Validar.senha(jsonObject.getString("password")));
+			System.out.println(Validar.nome(jsonObject.getString("cidade")));
+			if(jsonObject.getString("nome").length() >= 4) {
+				if(Validar.nome(jsonObject.getString("nome")) && Validar.cep(jsonObject.getString("cep")) 
+				&& Validar.endereco(jsonObject.getString("endereco")) && Validar.senha(jsonObject.getString("password"))
+				&& Validar.nome(jsonObject.getString("cidade"))) {
+					
+					user = UserDAO.addUser(jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("password"),
+					jsonObject.getString("endereco"), jsonObject.getString("cep"), jsonObject.getString("cidade"),
+					jsonObject.getString("estado"));
+									
+					if(user == null) {
+						jsonObject.put("id", -1);
+						response.setStatus(403);
+						PacienteService.enviarJSON(jsonObject.toString(), response);
+						return;
+					}
+									
+					System.out.println(user.toString());
+							// Response
+					jsonObject = new JSONObject();
+					jsonObject.put("id", user.getId());
+					jsonObject.put("nome", user.getNome());
+					jsonObject.put("email", user.getEmail());
+					jsonObject.put("password", user.getPassword());
+					jsonObject.put("endereco", user.getEndereco());
+					jsonObject.put("cep", user.getCep());
+					jsonObject.put("cidade", user.getCidade());
+					jsonObject.put("estado", user.getEstado());
+					response.setStatus(201);
+					PacienteService.enviarJSON(jsonObject.toString(), response);
+					return;
+				}
+				else {
+					response.setStatus(403);
+					PacienteService.enviarJSON(jsonObject.toString(), response);
+				}
+				
 			}
-			System.out.println(user.toString());
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", user.getId());
-			jsonObject.put("nome", user.getNome());
-			jsonObject.put("email", user.getEmail());
-			jsonObject.put("password", user.getPassword());
-			jsonObject.put("endereco", user.getEndereco());
-			jsonObject.put("cep", user.getCep());
-			jsonObject.put("cidade", user.getCidade());
-			jsonObject.put("estado", user.getEstado());
+			else {
+				response.setStatus(403);
+				PacienteService.enviarJSON(jsonObject.toString(), response);
+			}
+			
 		} catch (JSONException e) {
 		}
-		PacienteService.enviarJSON(jsonObject.toString(), response);
 	}
 	
 	@Override

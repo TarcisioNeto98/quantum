@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import dao.ConsultaDAO;
 import model.Consulta;
+import util.Validar;
 
 @WebServlet ("/api/consultas/*")
 public class ConsultaService extends HttpServlet {
@@ -55,22 +56,27 @@ public class ConsultaService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			consulta = ConsultaDAO.addConsulta(jsonObject.getString("valor"), jsonObject.getString("data"),
-			jsonObject.getInt("idPaciente"), Integer.parseInt(jsonObject.getString("idDentista")));
-			System.out.println(consulta.toString());
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", consulta.getId());
-			jsonObject.put("data", consulta.getData());
-			jsonObject.put("valor", consulta.getValor());
-			jsonObject.put("idPaciente", consulta.getIdPaciente());
-			jsonObject.put("idDentista", consulta.getIdDentista());
+			if(Validar.salario(jsonObject.getString("valor"))) {
+				consulta = ConsultaDAO.addConsulta(jsonObject.getString("valor"), jsonObject.getString("data"),
+				jsonObject.getInt("idPaciente"), Integer.parseInt(jsonObject.getString("idDentista")));
+				System.out.println(consulta.toString());
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", consulta.getId());
+				jsonObject.put("data", consulta.getData());
+				jsonObject.put("valor", consulta.getValor());
+				jsonObject.put("idPaciente", consulta.getIdPaciente());
+				jsonObject.put("idDentista", consulta.getIdDentista());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				PacienteService.enviarJSON(jsonObject.toString(), response);
+				return;
+			}
 		} catch (JSONException e) {
 		}
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(jsonObject.toString());
-		response.getWriter().flush();
+		PacienteService.enviarJSON(jsonObject.toString(), response);
 
 		// UPDATE BY ID
         /*String pathInfo = request.getPathInfo();

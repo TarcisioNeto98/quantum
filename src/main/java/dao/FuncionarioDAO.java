@@ -60,9 +60,9 @@ public class FuncionarioDAO {
 		return funcionarios;
 	}
 
-	public static Funcionario updateFuncionario(int id, String nome, String email, String endereco, String cidade, String estado, String cep, String salario) {
+	public static Funcionario updateFuncionario(int id, String nome, String email, String endereco, String cidade, String estado, String cep, Double salario) {
 		
-		Funcionario funcionario = new Funcionario(id, nome, email, endereco, cidade, estado, cep, Double.parseDouble(salario));
+		Funcionario funcionario = new Funcionario(id, nome, email, endereco, cidade, estado, cep, salario);
 		manager = factory.createEntityManager();
         manager.getTransaction().begin();
         manager.merge(funcionario);

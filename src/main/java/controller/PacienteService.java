@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import dao.PacienteDAO;
 import model.Paciente;
+import util.Validar;
 
 @WebServlet ("/api/pacientes/*")
 public class PacienteService extends HttpServlet {
@@ -109,18 +110,33 @@ public class PacienteService extends HttpServlet {
 
 		Paciente paciente = null;
 		JSONObject jsonObject = null;
+		jsonObject = new JSONObject(jb.toString());
+		System.out.println(Validar.nome(jsonObject.getString("nome")));
+		System.out.println(Validar.cep(jsonObject.getString("cep")));
+		System.out.println(Validar.email(jsonObject.getString("email")));
+		System.out.println(Validar.nome(jsonObject.getString("cidade")));
 		try {
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.email(jsonObject.getString("email")) &&
+			Validar.nome(jsonObject.getString("cidade")) && Validar.cep(jsonObject.getString("cep"))) {
 			// Request
-			jsonObject = new JSONObject(jb.toString());
-			paciente = PacienteDAO.addPaciente(jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("cidade"),jsonObject.getString("estado"), jsonObject.getString("cep"));
-			System.out.println(paciente.toString());
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", paciente.getId());
-			jsonObject.put("nome", paciente.getNome());
-			jsonObject.put("cidade", paciente.getCidade());
-			jsonObject.put("estado", paciente.getEstado());
-			jsonObject.put("cep", paciente.getCep());
+				paciente = PacienteDAO.addPaciente(jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("cidade"),
+				jsonObject.getString("estado"), jsonObject.getString("cep"));
+				System.out.println(paciente.toString());
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", paciente.getId());
+				jsonObject.put("nome", paciente.getNome());
+				jsonObject.put("cidade", paciente.getCidade());
+				jsonObject.put("estado", paciente.getEstado());
+				jsonObject.put("cep", paciente.getCep());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				System.out.println("dddd");
+				enviarJSON(jsonObject.toString(), response);
+				return;
+			}
 		} catch (JSONException e) {
 		}
 
@@ -142,18 +158,28 @@ public class PacienteService extends HttpServlet {
 
 		Paciente paciente = null;
 		JSONObject jsonObject = null;
+		jsonObject = new JSONObject(jb.toString());
 		try {
-			// Request
-			jsonObject = new JSONObject(jb.toString());
-			paciente = PacienteDAO.updatePaciente(jsonObject.getInt("id"), jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("cidade"),jsonObject.getString("estado"), jsonObject.getString("cep"));
-			System.out.println(paciente.toString());
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", paciente.getId());
-			jsonObject.put("nome", paciente.getNome());
-			jsonObject.put("cidade", paciente.getCidade());
-			jsonObject.put("estado", paciente.getEstado());
-			jsonObject.put("cep", paciente.getCep());
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.email(jsonObject.getString("email")) &&
+			Validar.nome(jsonObject.getString("cidade")) && Validar.cep(jsonObject.getString("cep"))) {
+				// Request
+				paciente = PacienteDAO.updatePaciente(jsonObject.getInt("id"), jsonObject.getString("nome"), jsonObject.getString("email"), jsonObject.getString("cidade"),jsonObject.getString("estado"), jsonObject.getString("cep"));
+				System.out.println(paciente.toString());
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", paciente.getId());
+				jsonObject.put("nome", paciente.getNome());
+				jsonObject.put("cidade", paciente.getCidade());
+				jsonObject.put("estado", paciente.getEstado());
+				jsonObject.put("cep", paciente.getCep());
+				resp.setStatus(201);
+			}
+			else {
+				resp.setStatus(401);
+				System.out.println("dddd");
+				enviarJSON(jsonObject.toString(), resp);
+				return;
+			}
 		} catch (JSONException e) {
 		}
 

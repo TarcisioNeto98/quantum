@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import dao.FuncionarioDAO;
 import model.Funcionario;
+import util.Validar;
 
 @WebServlet ("/api/funcionarios/*")
 public class FuncionarioService extends HttpServlet {
@@ -132,23 +133,34 @@ public class FuncionarioService extends HttpServlet {
 		}
 
 		Funcionario funcionario = null;
-		JSONObject jsonObject = null;
+		JSONObject jsonObject = new JSONObject(jb.toString());
 		try {
 			// Request
-			jsonObject = new JSONObject(jb.toString());
-			funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"),jsonObject.getString("email"),
-			jsonObject.getString("endereco"), jsonObject.getString("cidade"), jsonObject.getString("estado"),
-			jsonObject.getString("cep"), jsonObject.getString("salario"));
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", funcionario.getId());
-			jsonObject.put("nome", funcionario.getNome());
-			jsonObject.put("email", funcionario.getEmail());
-			jsonObject.put("endereco", funcionario.getEndereco());
-			jsonObject.put("cidade", funcionario.getCidade());
-			jsonObject.put("estado", funcionario.getEstado());
-			jsonObject.put("cep", funcionario.getCep());
-			jsonObject.put("salario", funcionario.getSalario());
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.cep(jsonObject.getString("cep")) 
+			&& Validar.endereco(jsonObject.getString("endereco")) && Validar.salario(jsonObject.getString("salario"))
+			&& Validar.nome(jsonObject.getString("cidade")) && Validar.email(jsonObject.getString("email"))) {
+				funcionario = FuncionarioDAO.addFuncionario(jsonObject.getString("nome"),jsonObject.getString("email"),
+				jsonObject.getString("endereco"), jsonObject.getString("cidade"), jsonObject.getString("estado"),
+				jsonObject.getString("cep"), jsonObject.getString("salario"));
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", funcionario.getId());
+				jsonObject.put("nome", funcionario.getNome());
+				jsonObject.put("email", funcionario.getEmail());
+				jsonObject.put("endereco", funcionario.getEndereco());
+				jsonObject.put("cidade", funcionario.getCidade());
+				jsonObject.put("estado", funcionario.getEstado());
+				jsonObject.put("cep", funcionario.getCep());
+				jsonObject.put("salario", funcionario.getSalario());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().print(jsonObject.toString());
+				response.getWriter().flush();
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -177,19 +189,31 @@ public class FuncionarioService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			funcionario = FuncionarioDAO.updateFuncionario(jsonObject.getInt("id"), jsonObject.getString("nome"), 
-			jsonObject.getString("email"), jsonObject.getString("endereco"), jsonObject.getString("cidade"),
-			jsonObject.getString("estado"), jsonObject.getString("cep"), jsonObject.getString("salario"));
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", funcionario.getId());
-			jsonObject.put("nome", funcionario.getNome());
-			jsonObject.put("email", funcionario.getEmail());
-			jsonObject.put("endereco", funcionario.getEndereco());
-			jsonObject.put("cidade", funcionario.getCidade());
-			jsonObject.put("estado", funcionario.getEstado());
-			jsonObject.put("cep", funcionario.getCep());
-			jsonObject.put("salario", funcionario.getSalario());
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.cep(jsonObject.getString("cep")) 
+			&& Validar.endereco(jsonObject.getString("endereco"))
+			&& Validar.nome(jsonObject.getString("cidade")) && Validar.email(jsonObject.getString("email"))) {
+				funcionario = FuncionarioDAO.updateFuncionario(jsonObject.getInt("id"), jsonObject.getString("nome"), 
+				jsonObject.getString("email"), jsonObject.getString("endereco"), jsonObject.getString("cidade"),
+				jsonObject.getString("estado"), jsonObject.getString("cep"), jsonObject.getDouble("salario"));
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", funcionario.getId());
+				jsonObject.put("nome", funcionario.getNome());
+				jsonObject.put("email", funcionario.getEmail());
+				jsonObject.put("endereco", funcionario.getEndereco());
+				jsonObject.put("cidade", funcionario.getCidade());
+				jsonObject.put("estado", funcionario.getEstado());
+				jsonObject.put("cep", funcionario.getCep());
+				jsonObject.put("salario", funcionario.getSalario());
+				resp.setStatus(201);
+			}
+			else {
+				resp.setStatus(401);
+				resp.setContentType("application/json");
+				resp.setCharacterEncoding("UTF-8");
+				resp.getWriter().print(jsonObject.toString());
+				resp.getWriter().flush();
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

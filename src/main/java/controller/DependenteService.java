@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import dao.DependenteDAO;
 import model.Dependente;
+import util.Validar;
 
 @WebServlet ("/api/dependentes/*")
 public class DependenteService extends HttpServlet {
@@ -94,14 +95,24 @@ public class DependenteService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			dependente = DependenteDAO.addDependente(jsonObject.getString("nome"), jsonObject.getString("cpf"),jsonObject.getInt("idFuncionario"));
-			
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", dependente.getId());
-			jsonObject.put("nome", dependente.getNome());
-			jsonObject.put("cpf", dependente.getCpf());
-			jsonObject.put("idFuncionario", dependente.getIdFuncionario());
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.cpf(jsonObject.getString("cpf"))) {
+				dependente = DependenteDAO.addDependente(jsonObject.getString("nome"), jsonObject.getString("cpf"),jsonObject.getInt("idFuncionario"));
+				
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", dependente.getId());
+				jsonObject.put("nome", dependente.getNome());
+				jsonObject.put("cpf", dependente.getCpf());
+				jsonObject.put("idFuncionario", dependente.getIdFuncionario());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().print(jsonObject.toString());
+				response.getWriter().flush();
+			}
 		} catch (JSONException e) {
 		}
 

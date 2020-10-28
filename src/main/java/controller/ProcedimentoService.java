@@ -18,6 +18,7 @@ import dao.PacienteDAO;
 import dao.ProcedimentoDAO;
 import model.Paciente;
 import model.Procedimento;
+import util.Validar;
 
 @WebServlet ("/api/procedimentos/*")
 public class ProcedimentoService extends HttpServlet {
@@ -97,66 +98,30 @@ public class ProcedimentoService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			procedimento = ProcedimentoDAO.addProcedimento(jsonObject.getString("nome"), jsonObject.getString("valor"),
-			jsonObject.getString("descricao"));
-			System.out.println(procedimento.toString());
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", procedimento.getId());
-			jsonObject.put("nome", procedimento.getNome());
-			jsonObject.put("valor", procedimento.getValor());
-			jsonObject.put("descricao", procedimento.getDescricao());
+			
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.salario(jsonObject.getString("valor")) 
+			&& Validar.nome(jsonObject.getString("descricao"))) {
+					
+				procedimento = ProcedimentoDAO.addProcedimento(jsonObject.getString("nome"), jsonObject.getString("valor"),
+				jsonObject.getString("descricao"));
+				System.out.println(procedimento.toString());
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", procedimento.getId());
+				jsonObject.put("nome", procedimento.getNome());
+				jsonObject.put("valor", procedimento.getValor());
+				jsonObject.put("descricao", procedimento.getDescricao());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				PacienteService.enviarJSON(jsonObject.toString(), response);
+				return;
+			}
 		} catch (JSONException e) {
 		}
 
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(jsonObject.toString());
-		response.getWriter().flush();
-
-		
-		/*// UPDATE BY ID
-        String pathInfo = request.getPathInfo();
- 
-        if (pathInfo != null) {
-            String[] params = pathInfo.split("/");
- 
-            if (params.length > 0) {
-                StringBuffer jb = new StringBuffer();
-                String line = null;
-                try {
-                    BufferedReader reader = request.getReader();
-                    while ((line = reader.readLine()) != null)
-                        jb.append(line);
-                } catch (Exception e) {
-                }
- 
-                Procedimento procedimento = null;
-                JSONObject jsonObject = null;
- 
-                try {
-                    // Request
-                    jsonObject = new JSONObject(jb.toString());
-                    procedimento = ProcedimentoDAO.updateProcedimento(Integer.parseInt(params[1]),
-                    		jsonObject.getString("nome"),
-                    		jsonObject.getDouble("valor"),
-                    		jsonObject.getString("descricao"));
-                    
-                    // Response
-                    jsonObject.put("id", procedimento.getId());
-					jsonObject.put("nome", procedimento.getNome());
-					jsonObject.put("valor", procedimento.getValor());
-					jsonObject.put("descricao", procedimento.getDescricao());
- 
-                } catch (JSONException e) {
-                }
- 
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(jsonObject.toString());
-                response.getWriter().flush();
-            }
-        }*/
+		PacienteService.enviarJSON(jsonObject.toString(), response);
 	}
 	
 	@Override

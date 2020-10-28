@@ -20,6 +20,7 @@ import dao.ProcedimentoDAO;
 import model.Consulta;
 import model.Dentista;
 import model.Procedimento;
+import util.Validar;
 
 @WebServlet ("/api/dentistas/*")
 public class DentistaService extends HttpServlet {
@@ -71,19 +72,22 @@ public class DentistaService extends HttpServlet {
 		try {
 			// Request
 			jsonObject = new JSONObject(jb.toString());
-			dentista = DentistaDAO.addDentista(jsonObject.getString("nome"), jsonObject.getString("especialidade"));
-			// Response
-			jsonObject = new JSONObject();
-			jsonObject.put("id", dentista.getId());
-			jsonObject.put("nome", dentista.getNome());
-			jsonObject.put("especialidade", dentista.getEspecialidade());
+			if(Validar.nome(jsonObject.getString("nome")) && Validar.nome(jsonObject.getString("especialidade"))) {
+				dentista = DentistaDAO.addDentista(jsonObject.getString("nome"), jsonObject.getString("especialidade"));
+				// Response
+				jsonObject = new JSONObject();
+				jsonObject.put("id", dentista.getId());
+				jsonObject.put("nome", dentista.getNome());
+				jsonObject.put("especialidade", dentista.getEspecialidade());
+				response.setStatus(201);
+			}
+			else {
+				response.setStatus(401);
+				PacienteService.enviarJSON(jsonObject.toString(), response);
+			}
 		} catch (JSONException e) {
 		}
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(jsonObject.toString());
-		response.getWriter().flush();
+		PacienteService.enviarJSON(jsonObject.toString(), response);
 
 	}
 
