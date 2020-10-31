@@ -72,15 +72,22 @@ public class FuncionarioDAO {
         return funcionario;
 	}
 
-	public static void deleteFuncionario(int id) {
+	public static Funcionario deleteFuncionario(int id) {
 		manager = factory.createEntityManager();
         
         Funcionario funcionario = manager.find(Funcionario.class, id);
+        
+        if(funcionario == null) {
+        	manager.close();
+        	return null;
+        }
         
         manager.getTransaction().begin();
         manager.remove(funcionario);
         manager.getTransaction().commit();
         manager.close();
+        System.out.println("Funcionario Excluido");
+        return funcionario;
 	}
 
 	public static List<Funcionario> getAllFuncionarios() {

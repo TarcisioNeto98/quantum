@@ -209,7 +209,8 @@ public class ConsultaService extends HttpServlet {
             String[] params = pathInfo.split("/");
  
             if (params.length > 0) {
-                ConsultaDAO.deleteConsulta(Integer.parseInt(params[1]));
+                if(ConsultaDAO.deleteConsulta(Integer.parseInt(params[1])) != null) response.setStatus(200);
+                else response.setStatus(401);
  
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");

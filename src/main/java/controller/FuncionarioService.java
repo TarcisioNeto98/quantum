@@ -230,6 +230,11 @@ public class FuncionarioService extends HttpServlet {
 		
 		// DELETE BY ID
         int id = Integer.parseInt(request.getParameter("id"));
-        FuncionarioDAO.deleteFuncionario(id);
+        if(FuncionarioDAO.deleteFuncionario(id) != null) response.setStatus(200);
+        else response.setStatus(401);
+        
+        response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().flush();
 	}
 }

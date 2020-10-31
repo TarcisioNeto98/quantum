@@ -35,7 +35,7 @@ public class UserDAO {
 		User usuario = null;
 		try{
 			usuario = manager.createQuery("from Usuario WHERE email=?1 AND password=?2", User.class).setParameter(1, email).
-			setParameter(2, email).getSingleResult();
+			setParameter(2, password).getSingleResult();
 			manager.close();
 		}catch(NoResultException e) {
 			

@@ -190,7 +190,10 @@ public class PacienteService extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// DELETE BY ID
+		JSONObject json = new JSONObject();
         String id = request.getParameter("id");
-        PacienteDAO.deletePaciente(Integer.parseInt(id));
+        if(PacienteDAO.deletePaciente(Integer.parseInt(id)) != null) response.setStatus(200);
+        else response.setStatus(401);
+        enviarJSON(json.toString(), response);
 	}
 }

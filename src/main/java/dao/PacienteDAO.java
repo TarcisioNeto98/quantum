@@ -64,15 +64,20 @@ public class PacienteDAO {
 	}
 	
 
-	public static void deletePaciente(int id) {
+	public static Paciente deletePaciente(int id) {
 		manager = factory.createEntityManager();
-		
 		Paciente paciente = manager.find(Paciente.class, id);
 		
+		if(paciente == null) {
+			manager.close();
+			return null;
+		}
 		manager.getTransaction().begin();
 		manager.remove(paciente);
 		manager.getTransaction().commit();
+		
 		manager.close();
+		return paciente;
 	}
 
 	public static List<Paciente> getAllPacientes() {

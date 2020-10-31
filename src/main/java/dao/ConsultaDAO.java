@@ -63,14 +63,19 @@ public class ConsultaDAO {
 		
 	}
 
-	public static void deleteConsulta(int id) {
+	public static Consulta deleteConsulta(int id) {
 		manager = factory.createEntityManager();
 		Consulta consulta = manager.find(Consulta.class, id);
 		
+		if(consulta == null) {
+			manager.close();
+			return consulta;
+		}
 		manager.getTransaction().begin();
 		manager.remove(consulta);
 		manager.getTransaction().commit();
 		manager.close();
+		return consulta;
 	}
 
 	public static List<Consulta> getAllConsultas() {
